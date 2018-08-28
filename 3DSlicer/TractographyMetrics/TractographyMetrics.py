@@ -297,7 +297,6 @@ class TractographyMetricsWidget:
 
         slicer.util.reloadScriptedModule(self.moduleName)
 
-
     def onReloadAndTest(self):
         try:
             self.onReload()
