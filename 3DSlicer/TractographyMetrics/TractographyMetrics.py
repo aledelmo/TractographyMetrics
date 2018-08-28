@@ -48,14 +48,6 @@ class TractographyMetrics:
         tester.runTest()
 
 
-# class It:
-#     def __init__(self, node): self.node = node
-#
-#     def __enter__(self): return self.node
-#
-#     def __exit__(self, type, value, traceback): return False
-
-
 class TractographyMetricsWidget:
     def __init__(self, parent=None):
         self.moduleName = self.__class__.__name__
