@@ -6,9 +6,14 @@ import shutil
 import tempfile
 import unittest
 
+import csv
+import sys
 import ctk
 import qt
 import slicer
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+import processing_tm as tm
 
 __author__ = 'Alessandro Delmonte'
 __email__ = 'delmonte.ale92@gmail.com'
@@ -276,8 +281,63 @@ class TractographyMetricsWidget:
 
     def on_compute_button(self):
         self.output_file_selector.addCurrentPathToHistory()
-        print(self.output_file_selector.currentPath)
-        print(self.additional_info.document().toPlainText().encode('utf8'))
+
+        properties = {'useCompression': 0}
+        tracto_path = os.path.join(self.tmp, 'tracto.vtk')
+        slicer.util.saveNode(self.tracto_node, tracto_path, properties)
+
+        if self.bzero_node:
+            bzero_path = os.path.join(self.tmp, 'bzero.nii')
+            slicer.util.saveNode(self.bzero_node, bzero_path, properties)
+        else:
+            bzero_path = None
+        if self.fa_node:
+            fa_path = os.path.join(self.tmp, 'fa.nii')
+            slicer.util.saveNode(self.fa_node, fa_path, properties)
+        else:
+            fa_path = None
+        if self.md_node:
+            md_path = os.path.join(self.tmp, 'md.nii')
+            slicer.util.saveNode(self.md_node, md_path, properties)
+        else:
+            md_path = None
+
+        header = self.additional_info.document().toPlainText().encode('utf8')
+
+        txt_path = self.output_file_selector.currentPath.encode('utf-8')
+
+        to_csv = self.to_csv.isChecked()
+        to_xlsx = self.to_xlsx.isChecked()
+
+        csv_fname = self.logic.compute_stats(tracto_path, txt_path, fa_path, bzero_path, md_path, header, to_csv,
+                                             to_xlsx, None)
+
+        pop_up_window = qt.QDialog(slicer.util.mainWindow())
+        pop_up_window.setLayout(qt.QVBoxLayout())
+        pop_up_title = qt.QLabel('Fiber Statistics')
+        pop_up_window.layout().addWidget(pop_up_title)
+        pop_up_window.layout().setAlignment(pop_up_title, 4)
+
+        with open(csv_fname, "r") as f:
+            reader = csv.reader(f, delimiter=";")
+            lines = [line for line in reader]
+
+        table = qt.QTableWidget(len(lines[0]), 2)
+        for i in range(len(lines[0])):
+            v = qt.QTableWidgetItem(lines[0][i])
+            table.setItem(i, 0, v)
+            v = qt.QTableWidgetItem(lines[1][i])
+            table.setItem(i, 1, v)
+
+        table.horizontalHeader().setResizeMode(qt.QHeaderView.Stretch)
+        table.horizontalHeader().setStretchLastSection(True)
+        pop_up_window.layout().addWidget(table)
+
+        pop_up_window.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
+
+        pop_up_window.show()
+
+        self.cleanup()
 
     def onReload(self):
 
@@ -316,6 +376,14 @@ class TractographyMetricsWidget:
 class TractographyMetricsLogic:
     def __init__(self, temp_folder):
         self.temp_folder = temp_folder
+
+    def compute_stats(self, tractogram, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header, to_csv, to_xlsx,
+                      perc_resampling):
+        from_plugin = {'csv_fname': os.path.join(self.temp_folder, 'table.csv')}
+        csv_fname = tm.proc(tractogram, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header, to_csv, to_xlsx,
+                            perc_resampling, from_plugin)
+
+        return csv_fname
 
 
 class TractographyMetricsTest(unittest.TestCase):
