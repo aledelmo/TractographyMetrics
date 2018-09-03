@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from builtins import int
+from builtins import int, range
 from .utils import ras_to_ijk
-from .tractogram import streamlines_mapvolume
 from itertools import islice
 
 
@@ -224,8 +223,9 @@ class Metrics:
             cum_len = [get_length(tract[:n]) for n in range(1, len(tract) + 1)]
             ten_perc = get_length(tract) / 10.
             for j in range(1, 11):
-                current = tract[(ten_perc * (j - 1) < cum_len) & (cum_len < ten_perc * j)]
-                behavior[i, j - 1] = np.asarray(streamlines_mapvolume([current], scalar_map, self.affine)).mean()
+                behavior[i, j - 1] = np.asarray(scalar_measurement[i])[
+                    (ten_perc * (j - 1) <= cum_len) & (cum_len <= ten_perc * j)].mean()
+
         return np.mean(behavior, axis=0)
 
     def get_str(self):
