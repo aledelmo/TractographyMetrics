@@ -5,7 +5,7 @@ import os
 import shutil
 import tempfile
 import unittest
-
+from builtins import range
 import csv
 import sys
 import ctk
