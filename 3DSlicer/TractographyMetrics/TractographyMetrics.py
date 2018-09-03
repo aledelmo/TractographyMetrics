@@ -309,8 +309,9 @@ class TractographyMetricsWidget:
         to_csv = self.to_csv.isChecked()
         to_xlsx = self.to_xlsx.isChecked()
 
-        csv_fname = self.logic.compute_stats(tracto_path, txt_path, fa_path, bzero_path, md_path, header, to_csv,
-                                             to_xlsx, None)
+        csv_fname, behaviors = self.logic.compute_stats(tracto_path, txt_path, fa_path, bzero_path, md_path, header,
+                                                        to_csv,
+                                                        to_xlsx, None)
 
         pop_up_window = qt.QDialog(slicer.util.mainWindow())
         pop_up_window.setLayout(qt.QVBoxLayout())
@@ -334,6 +335,58 @@ class TractographyMetricsWidget:
         pop_up_window.layout().addWidget(table)
 
         pop_up_window.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
+
+        if 'FA' in behaviors or 'b-zero' in behaviors or 'MD' in behaviors:
+            lns = slicer.mrmlScene.GetNodesByClass('vtkMRMLLayoutNode')
+            lns.InitTraversal()
+            ln = lns.GetNextItemAsObject()
+            ln.SetViewArrangement(24)
+
+            cvns = slicer.mrmlScene.GetNodesByClass('vtkMRMLChartViewNode')
+            cvns.InitTraversal()
+            cvn = cvns.GetNextItemAsObject()
+
+            cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+
+            if 'FA' in behaviors:
+                dn_fa = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                a = dn_fa.GetArray()
+                a.SetNumberOfTuples(10)
+                x_label = range(10, 110, 10)
+                for i in range(10):
+                    a.SetComponent(i, 0, x_label[i])
+                    a.SetComponent(i, 1, behaviors['FA'][i])
+
+                cn.AddArray('FA', dn_fa.GetID())
+
+            if 'MD' in behaviors:
+                dn_md = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                a = dn_md.GetArray()
+                a.SetNumberOfTuples(10)
+                x_label = range(10, 110, 10)
+                for i in range(10):
+                    a.SetComponent(i, 0, x_label[i])
+                    a.SetComponent(i, 1, behaviors['MD'][i])
+
+                cn.AddArray('MD', dn_md.GetID())
+
+            if 'b-zero' in behaviors:
+                dn_bz = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                a = dn_bz.GetArray()
+                a.SetNumberOfTuples(10)
+                x_label = range(10, 110, 10)
+                for i in range(10):
+                    a.SetComponent(i, 0, x_label[i])
+                    a.SetComponent(i, 1, behaviors['b-zero'][i])
+
+                cn.AddArray('b-zero', dn_bz.GetID())
+
+            cn.SetProperty('default', 'title', 'Diffusion Behaviors')
+            cn.SetProperty('default', 'showLegend', 'on')
+            cn.SetProperty('default', 'xAxisLabel', 'Fibers Portion (%)')
+            cn.SetProperty('default', 'yAxisLabel', 'Normalized Metric Values')
+
+            cvn.SetChartNodeID(cn.GetID())
 
         pop_up_window.show()
 
@@ -380,10 +433,11 @@ class TractographyMetricsLogic:
     def compute_stats(self, tractogram, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header, to_csv, to_xlsx,
                       perc_resampling):
         from_plugin = {'csv_fname': os.path.join(self.temp_folder, 'table.csv')}
-        csv_fname = tm.proc(tractogram, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header, to_csv, to_xlsx,
-                            perc_resampling, from_plugin)
+        csv_fname, behaviors = tm.proc(tractogram, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header,
+                                       to_csv, to_xlsx,
+                                       perc_resampling, from_plugin)
 
-        return csv_fname
+        return csv_fname, behaviors
 
 
 class TractographyMetricsTest(unittest.TestCase):
