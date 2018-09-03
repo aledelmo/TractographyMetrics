@@ -19,18 +19,19 @@ def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_file
         tractogram.resample(perc_resampling)
 
     metrics = lg.Metrics(tractogram)
+    behaviors = dict()
     if fa_filepath:
         fa, affine = lg.load_nii(fa_filepath)
         metrics.set_affine(affine)
-        metrics.diffusion(fa, 'FA')
+        behaviors['FA'] = metrics.diffusion(fa, 'FA')
     if bzero_filepath:
         bzero, affine = lg.load_nii(bzero_filepath)
         metrics.set_affine(affine)
-        metrics.diffusion(bzero, 'b-zero')
+        behaviors['b-zero'] = metrics.diffusion(bzero, 'b-zero')
     if md_filepath:
         md, affine = lg.load_nii(md_filepath)
         metrics.set_affine(affine)
-        metrics.diffusion(md, 'MD')
+        behaviors['MD'] = metrics.diffusion(md, 'MD')
 
     metrics.geometric()
 
@@ -55,7 +56,7 @@ def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_file
             save_csv(csv_filepath, body_dict)
 
     if from_plugin is not None:
-        return csv_filepath
+        return csv_filepath, behaviors
 
     # with requests.Session() as s:
     #     s.auth = ('adelmonte', 'JVs4qmBk')

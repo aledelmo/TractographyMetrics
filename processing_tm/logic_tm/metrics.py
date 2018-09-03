@@ -193,6 +193,8 @@ class Metrics:
             self.txt_dict['Termination Points Mean Position (mm)'] = seed_points_mean_pos
 
     def diffusion(self, scalar_map, scalar_name):
+        if scalar_name != 'FA':
+            scalar_map = (scalar_map - np.amin(scalar_map)) / (np.amax(scalar_map) - np.amin(scalar_map))
         scalar_measurement = self.tractogram.mapping(scalar_map, self.affine)
         scalar_measurement_mean = np.asarray([np.asarray(m).mean() for m in scalar_measurement])
 
@@ -217,41 +219,14 @@ class Metrics:
         self.txt_dict['Max ' + scalar_name + ' Value'] = max_shortest
         self.txt_dict['Min ' + scalar_name + ' Value'] = min_shortest
 
-        # if scalar_name == 'FA':
-        #     lengths = np.asarray(self.tractogram.lengths(), dtype=np.float64)
-        #     print lengths
-        # for i, l in enumerate(lengths):
-        #     ten_perc = l * 0.1
-        #     tract = self.tractogram.tractogram[i]
-        #     print len(tract)
-        #     old_j = 0
-        #     j = 2
-        #     tract_slice = tract[old_j:j]
-        #     count = 0
-        #     for z in range(1, 10):
-        #         while ((((tract_slice[1:] - tract_slice[:-1]) ** 2).sum(1)) ** .5).sum() < ten_perc * z or j != len(
-        #                 tract):
-        #             j += 1
-        #             tract_slice = tract[old_j:j]
-        #         old_j = j
-        #         print len(tract_slice)
-
-        # from itertools import accumulate
-        #
-        # cum_lengths = accumulate(self.tractogram.tractogram[0])
-        # print cum_lengths
-
-        # a = [s for s in batch_iterable(scalar_measurement, int(len(scalar_measurement) / 9))]
-
-        # if scalar_name == 'FA':
-        #     seed_points = np.asarray(self.tractogram.extremities())[:, 0, :]
-        #     seed_points = np.asarray([s for s in seed_points])
-        #     a = np.asarray(streamlines_mapvolume([seed_points], scalar_map, self.affine)).mean()
-        #     print a
-        #     ter_points = np.asarray(self.tractogram.extremities())[:, -1, :]
-        #     ter_points = np.asarray([s for s in ter_points])
-        #     a = np.asarray(streamlines_mapvolume([ter_points], scalar_map, self.affine)).mean()
-        #     print a
+        behavior = np.zeros((len(self.tractogram.tractogram), 10))
+        for i, tract in enumerate(self.tractogram.tractogram):
+            cum_len = [get_length(tract[:n]) for n in range(1, len(tract) + 1)]
+            ten_perc = get_length(tract) / 10.
+            for j in range(1, 11):
+                current = tract[(ten_perc * (j - 1) < cum_len) & (cum_len < ten_perc * j)]
+                behavior[i, j - 1] = np.asarray(streamlines_mapvolume([current], scalar_map, self.affine)).mean()
+        return np.mean(behavior, axis=0)
 
     def get_str(self):
         return self.txt_str
