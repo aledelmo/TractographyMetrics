@@ -13,6 +13,10 @@ __email__ = 'delmonte.ale92@gmail.com'
 
 def main():
     tractogram, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header, to_csv, to_xlsx, perc_resampling = setup()
+
+    if not fa_filepath and not bzero_filepath and not md_filepath:
+        sys.exit(1)
+
     tm.proc(tractogram, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header, to_csv, to_xlsx,
             perc_resampling)
 
