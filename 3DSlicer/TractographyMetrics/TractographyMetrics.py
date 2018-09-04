@@ -123,7 +123,7 @@ class TractographyMetricsWidget:
         tm_form_layout.addRow(line)
 
         groupbox = qt.QGroupBox()
-        groupbox.setTitle('Optional scalar map measurements:')
+        groupbox.setTitle('Choose one or more scalar map:')
         options_grid_layout = qt.QGridLayout(groupbox)
         options_grid_layout.setColumnStretch(1, 1)
         options_grid_layout.setColumnStretch(2, 1)
@@ -286,111 +286,121 @@ class TractographyMetricsWidget:
         tracto_path = os.path.join(self.tmp, 'tracto.vtk')
         slicer.util.saveNode(self.tracto_node, tracto_path, properties)
 
-        if self.bzero_node:
-            bzero_path = os.path.join(self.tmp, 'bzero.nii')
-            slicer.util.saveNode(self.bzero_node, bzero_path, properties)
+        if self.bzero_node or self.fa_node or self.md_node:
+            if self.bzero_node:
+                bzero_path = os.path.join(self.tmp, 'bzero.nii')
+                slicer.util.saveNode(self.bzero_node, bzero_path, properties)
+            else:
+                bzero_path = None
+            if self.fa_node:
+                fa_path = os.path.join(self.tmp, 'fa.nii')
+                slicer.util.saveNode(self.fa_node, fa_path, properties)
+            else:
+                fa_path = None
+            if self.md_node:
+                md_path = os.path.join(self.tmp, 'md.nii')
+                slicer.util.saveNode(self.md_node, md_path, properties)
+            else:
+                md_path = None
+
+            header = self.additional_info.document().toPlainText().encode('utf8')
+
+            txt_path = self.output_file_selector.currentPath.encode('utf-8')
+
+            to_csv = self.to_csv.isChecked()
+            to_xlsx = self.to_xlsx.isChecked()
+
+            csv_fname, behaviors = self.logic.compute_stats(tracto_path, txt_path, fa_path, bzero_path, md_path, header,
+                                                            to_csv,
+                                                            to_xlsx, None)
+
+            pop_up_window = qt.QDialog(slicer.util.mainWindow())
+            pop_up_window.setLayout(qt.QVBoxLayout())
+            pop_up_title = qt.QLabel('Fiber Statistics')
+            pop_up_window.layout().addWidget(pop_up_title)
+            pop_up_window.layout().setAlignment(pop_up_title, 4)
+
+            with open(csv_fname, "r") as f:
+                reader = csv.reader(f, delimiter=";")
+                lines = [line for line in reader]
+
+            table = qt.QTableWidget(len(lines[0]), 2)
+            for i in range(len(lines[0])):
+                v = qt.QTableWidgetItem(lines[0][i])
+                table.setItem(i, 0, v)
+                v = qt.QTableWidgetItem(lines[1][i])
+                table.setItem(i, 1, v)
+
+            table.horizontalHeader().setResizeMode(qt.QHeaderView.Stretch)
+            table.horizontalHeader().setStretchLastSection(True)
+            pop_up_window.layout().addWidget(table)
+
+            pop_up_window.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
+
+            if self.to_plot.isChecked():
+                if 'FA' in behaviors or 'b-zero' in behaviors or 'MD' in behaviors:
+                    lns = slicer.mrmlScene.GetNodesByClass('vtkMRMLLayoutNode')
+                    lns.InitTraversal()
+                    ln = lns.GetNextItemAsObject()
+                    ln.SetViewArrangement(24)
+
+                    cvns = slicer.mrmlScene.GetNodesByClass('vtkMRMLChartViewNode')
+                    cvns.InitTraversal()
+                    cvn = cvns.GetNextItemAsObject()
+
+                    cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+
+                    if 'FA' in behaviors:
+                        dn_fa = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                        a = dn_fa.GetArray()
+                        a.SetNumberOfTuples(20)
+                        x_label = range(5, 105, 5)
+                        for i in range(20):
+                            a.SetComponent(i, 0, x_label[i])
+                            a.SetComponent(i, 1, behaviors['FA'][i])
+
+                        cn.AddArray('FA', dn_fa.GetID())
+
+                    if 'MD' in behaviors:
+                        dn_md = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                        a = dn_md.GetArray()
+                        a.SetNumberOfTuples(20)
+                        x_label = range(5, 105, 5)
+                        for i in range(20):
+                            a.SetComponent(i, 0, x_label[i])
+                            a.SetComponent(i, 1, behaviors['MD'][i])
+
+                        cn.AddArray('MD', dn_md.GetID())
+
+                    if 'b-zero' in behaviors:
+                        dn_bz = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                        a = dn_bz.GetArray()
+                        a.SetNumberOfTuples(20)
+                        x_label = range(5, 105, 5)
+                        for i in range(20):
+                            a.SetComponent(i, 0, x_label[i])
+                            a.SetComponent(i, 1, behaviors['b-zero'][i])
+
+                        cn.AddArray('b-zero', dn_bz.GetID())
+
+                    cn.SetProperty('default', 'title', 'Diffusion Behaviors')
+                    cn.SetProperty('default', 'showLegend', 'on')
+                    cn.SetProperty('default', 'showMarkers', 'on')
+                    cn.SetProperty('default', 'xAxisPad', '0.2')
+                    cn.SetProperty('default', 'xAxisLabel', 'Fibers Portion (%)')
+                    cn.SetProperty('default', 'yAxisLabel', 'Normalized Metric Values')
+
+                    cvn.SetChartNodeID(cn.GetID())
+
+            pop_up_window.show()
+
+            self.cleanup()
         else:
-            bzero_path = None
-        if self.fa_node:
-            fa_path = os.path.join(self.tmp, 'fa.nii')
-            slicer.util.saveNode(self.fa_node, fa_path, properties)
-        else:
-            fa_path = None
-        if self.md_node:
-            md_path = os.path.join(self.tmp, 'md.nii')
-            slicer.util.saveNode(self.md_node, md_path, properties)
-        else:
-            md_path = None
-
-        header = self.additional_info.document().toPlainText().encode('utf8')
-
-        txt_path = self.output_file_selector.currentPath.encode('utf-8')
-
-        to_csv = self.to_csv.isChecked()
-        to_xlsx = self.to_xlsx.isChecked()
-
-        csv_fname, behaviors = self.logic.compute_stats(tracto_path, txt_path, fa_path, bzero_path, md_path, header,
-                                                        to_csv,
-                                                        to_xlsx, None)
-
-        pop_up_window = qt.QDialog(slicer.util.mainWindow())
-        pop_up_window.setLayout(qt.QVBoxLayout())
-        pop_up_title = qt.QLabel('Fiber Statistics')
-        pop_up_window.layout().addWidget(pop_up_title)
-        pop_up_window.layout().setAlignment(pop_up_title, 4)
-
-        with open(csv_fname, "r") as f:
-            reader = csv.reader(f, delimiter=";")
-            lines = [line for line in reader]
-
-        table = qt.QTableWidget(len(lines[0]), 2)
-        for i in range(len(lines[0])):
-            v = qt.QTableWidgetItem(lines[0][i])
-            table.setItem(i, 0, v)
-            v = qt.QTableWidgetItem(lines[1][i])
-            table.setItem(i, 1, v)
-
-        table.horizontalHeader().setResizeMode(qt.QHeaderView.Stretch)
-        table.horizontalHeader().setStretchLastSection(True)
-        pop_up_window.layout().addWidget(table)
-
-        pop_up_window.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
-
-        if 'FA' in behaviors or 'b-zero' in behaviors or 'MD' in behaviors:
-            lns = slicer.mrmlScene.GetNodesByClass('vtkMRMLLayoutNode')
-            lns.InitTraversal()
-            ln = lns.GetNextItemAsObject()
-            ln.SetViewArrangement(24)
-
-            cvns = slicer.mrmlScene.GetNodesByClass('vtkMRMLChartViewNode')
-            cvns.InitTraversal()
-            cvn = cvns.GetNextItemAsObject()
-
-            cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-
-            if 'FA' in behaviors:
-                dn_fa = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-                a = dn_fa.GetArray()
-                a.SetNumberOfTuples(10)
-                x_label = range(10, 110, 10)
-                for i in range(10):
-                    a.SetComponent(i, 0, x_label[i])
-                    a.SetComponent(i, 1, behaviors['FA'][i])
-
-                cn.AddArray('FA', dn_fa.GetID())
-
-            if 'MD' in behaviors:
-                dn_md = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-                a = dn_md.GetArray()
-                a.SetNumberOfTuples(10)
-                x_label = range(10, 110, 10)
-                for i in range(10):
-                    a.SetComponent(i, 0, x_label[i])
-                    a.SetComponent(i, 1, behaviors['MD'][i])
-
-                cn.AddArray('MD', dn_md.GetID())
-
-            if 'b-zero' in behaviors:
-                dn_bz = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-                a = dn_bz.GetArray()
-                a.SetNumberOfTuples(10)
-                x_label = range(10, 110, 10)
-                for i in range(10):
-                    a.SetComponent(i, 0, x_label[i])
-                    a.SetComponent(i, 1, behaviors['b-zero'][i])
-
-                cn.AddArray('b-zero', dn_bz.GetID())
-
-            cn.SetProperty('default', 'title', 'Diffusion Behaviors')
-            cn.SetProperty('default', 'showLegend', 'on')
-            cn.SetProperty('default', 'xAxisLabel', 'Fibers Portion (%)')
-            cn.SetProperty('default', 'yAxisLabel', 'Normalized Metric Values')
-
-            cvn.SetChartNodeID(cn.GetID())
-
-        pop_up_window.show()
-
-        self.cleanup()
+            message = qt.QMessageBox()
+            message.setText('At least one scalar metric map must be selected')
+            # message.setInformativeText('At least one scalar metric map must be selected')
+            message.setIcon(qt.QMessageBox.Critical)
+            message.exec_()
 
     def onReload(self):
 
