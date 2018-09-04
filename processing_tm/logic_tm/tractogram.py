@@ -17,6 +17,24 @@ from dipy.tracking.metrics import midpoint, winding
 from nibabel.affines import apply_affine
 
 
+def get_centroid(tract, affine):
+    tract = [set_number_of_points(s, len(tract[0])) for s in tract]
+    central_line = []
+    for i in range(len(tract[0])):
+        x, y, z = (0.0, 0.0, 0.0)
+        for s in tract:
+            x, y, z = (n + s[i][j] for j, n in enumerate((x, y, z)))
+        x, y, z = (n / len(tract) for n in (x, y, z))
+        central_line.append([x, y, z])
+    central_line = np.array(central_line)
+    inverse = np.linalg.inv(affine)
+    central_line_vox = [apply_affine(inverse, np.array(s)) for s in central_line]
+    if central_line_vox[0][2] < central_line_vox[-1][2]:
+        return central_line[::-1]
+
+    return central_line
+
+
 def get_shortest(tract):
     return ((((tract[0] - tract[-1]) ** 2).sum()) ** .5).sum()
 
@@ -59,8 +77,6 @@ class Tracts:
         self.tractogram = tractogram
         self.header = header
 
-        self.compress()
-
     @property
     def tractogram(self):
         return self._tractogram
@@ -88,11 +104,21 @@ class Tracts:
     def compress(self):
         self.tractogram = compress_streamlines(self.tractogram)
 
-    def sort(self):
+    def sort(self, affine):
         """
         Reorient fiber in the same direction
         """
+
         template = self.tractogram[0]
+        initial_flip = []
+        for i, s in enumerate(self.tractogram):
+            dist_norm = np.linalg.norm(s[0] - template[0]) + np.linalg.norm(s[-1] - template[-1])
+            dist_flipped = np.linalg.norm(s[-1] - template[0]) + np.linalg.norm(s[0] - template[-1])
+            if dist_flipped < dist_norm:
+                initial_flip.append(s[::-1])
+            else:
+                initial_flip.append(s)
+        template = get_centroid(initial_flip, affine)
         for i, s in enumerate(self.tractogram):
             dist_norm = np.linalg.norm(s[0] - template[0]) + np.linalg.norm(s[-1] - template[-1])
             dist_flipped = np.linalg.norm(s[-1] - template[0]) + np.linalg.norm(s[0] - template[-1])

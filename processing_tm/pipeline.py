@@ -8,9 +8,6 @@ import xlsxwriter
 from six import iteritems
 
 
-# import requests
-
-
 def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_filepath, header, to_csv, to_xlsx,
          perc_resampling, from_plugin=False):
     tractogram = load_tracts(tractogram_filepath)
@@ -23,14 +20,19 @@ def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_file
     if fa_filepath:
         fa, affine = lg.load_nii(fa_filepath)
         metrics.set_affine(affine)
+        tractogram.sort(affine)
         behaviors['FA'] = metrics.diffusion(fa, 'FA')
     if bzero_filepath:
         bzero, affine = lg.load_nii(bzero_filepath)
         metrics.set_affine(affine)
+        if not fa_filepath:
+            tractogram.sort(affine)
         behaviors['b-zero'] = metrics.diffusion(bzero, 'b-zero')
     if md_filepath:
         md, affine = lg.load_nii(md_filepath)
         metrics.set_affine(affine)
+        if not fa_filepath or bzero_filepath:
+            tractogram.sort(affine)
         behaviors['MD'] = metrics.diffusion(md, 'MD')
 
     metrics.geometric()
@@ -57,31 +59,6 @@ def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_file
 
     if from_plugin is not None:
         return csv_filepath, behaviors
-
-    # with requests.Session() as s:
-    #     s.auth = ('adelmonte', 'JVs4qmBk')
-    #     # p = s.post('https://dsp.institutimagine.org/imag2/connexion.php?login=&script_appel=/imag2/index.php',
-    #     #            data=payload)
-    #     # print the html returned or something more intelligent to see if it's a successful login page.
-    #     # print(p.text)
-    #     #
-    #     # An authorised request.
-    #     r = s.get('https://dsp.institutimagine.org/imag2/appli/entrepot_application.php#resultat', verify=False)
-    #     # r = s.get(
-    #     #     'https://dsp.institutimagine.org/imag2/appli/entrepot_application.php?rech_NUM_PATIENT=1000003201&action=rechercher&table_principal=IMAG2_PATIENT', verify=False)
-    #     #
-    #     # r = s.get('https://dsp.institutimagine.org/imag2/appli/affiche_graph_sous_menu.php',  verify=False)
-    #     # r = s.get('https://dsp.institutimagine.org/imag2/appli/affiche_graph_sous_menu.php', verify=False)
-    #     print(r.headers)
-    #     print(r.content)
-    #
-    #     '''
-    #     <tr style="cursor: pointer; background-color: rgb(255, 255, 255);" onmouseout="this.style.backgroundColor='#ffffff';
-    #     " onmouseover="this.style.backgroundColor='#C6C8D7';" onclick="window.open('appli/entrepot_application.php?rech_
-    #     NUM_PATIENT=1000003153&amp;action=rechercher&amp;table_principal=IMAG2_PATIENT','_blank')"
-    #     ><td>19/03/2018</td><td>1-4-46</td><td>17/02/2016</td></tr>
-    #
-    #     '''
 
 
 def load_tracts(fname):
