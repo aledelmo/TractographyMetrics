@@ -155,8 +155,6 @@ class Metrics:
         self.txt_dict['Max Turning Angle'] = max_turning_angles
         self.txt_dict['Min Turning Angle'] = min_turning_angles
 
-        self.tractogram.sort()
-
         extremities = np.asarray(self.tractogram.extremities())
 
         seed_points = extremities[:, 0, :]
@@ -218,11 +216,11 @@ class Metrics:
         self.txt_dict['Max ' + scalar_name + ' Value'] = max_shortest
         self.txt_dict['Min ' + scalar_name + ' Value'] = min_shortest
 
-        behavior = np.zeros((len(self.tractogram.tractogram), 10))
+        behavior = np.zeros((self.tractogram.n_lines(), 20))
         for i, tract in enumerate(self.tractogram.tractogram):
             cum_len = [get_length(tract[:n]) for n in range(1, len(tract) + 1)]
-            ten_perc = get_length(tract) / 10.
-            for j in range(1, 11):
+            ten_perc = get_length(tract) / 20.
+            for j in range(1, 21):
                 behavior[i, j - 1] = np.asarray(scalar_measurement[i])[
                     (ten_perc * (j - 1) <= cum_len) & (cum_len <= ten_perc * j)].mean()
 
