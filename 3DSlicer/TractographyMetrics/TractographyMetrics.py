@@ -39,7 +39,7 @@ class TractographyMetrics:
             slicer.selfTests
         except AttributeError:
             slicer.selfTests = {}
-        slicer.selfTests['PQL'] = self.runTest
+        slicer.selfTests['TractographyMetrics'] = self.runTest
 
     def __repr__(self):
         return 'TractographyMetrics(parent={})'.format(self.parent)
