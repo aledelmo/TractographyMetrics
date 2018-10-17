@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import csv
 import os
 import shutil
+import sys
 import tempfile
 import unittest
-from builtins import range
-import csv
-import sys
+
 import ctk
 import qt
 import slicer
+import vtk
+from builtins import range, int
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 import processing_tm as tm
@@ -339,58 +341,148 @@ class TractographyMetricsWidget:
 
             if self.to_plot.isChecked():
                 if 'FA' in behaviors or 'b-zero' in behaviors or 'MD' in behaviors:
-                    lns = slicer.mrmlScene.GetNodesByClass('vtkMRMLLayoutNode')
-                    lns.InitTraversal()
-                    ln = lns.GetNextItemAsObject()
-                    ln.SetViewArrangement(24)
+                    if int(slicer.app.applicationVersion.split('.')[1]):
+                        lns = slicer.mrmlScene.GetNodesByClass('vtkMRMLLayoutNode')
+                        lns.InitTraversal()
+                        ln = lns.GetNextItemAsObject()
+                        ln.SetViewArrangement(24)
 
-                    cvns = slicer.mrmlScene.GetNodesByClass('vtkMRMLChartViewNode')
-                    cvns.InitTraversal()
-                    cvn = cvns.GetNextItemAsObject()
+                        cvns = slicer.mrmlScene.GetNodesByClass('vtkMRMLChartViewNode')
+                        cvns.InitTraversal()
+                        cvn = cvns.GetNextItemAsObject()
 
-                    cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+                        cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
 
-                    if 'FA' in behaviors:
-                        dn_fa = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-                        a = dn_fa.GetArray()
-                        a.SetNumberOfTuples(20)
-                        x_label = range(5, 105, 5)
-                        for i in range(20):
-                            a.SetComponent(i, 0, x_label[i])
-                            a.SetComponent(i, 1, behaviors['FA'][i])
+                        if 'FA' in behaviors:
+                            dn_fa = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                            a = dn_fa.GetArray()
+                            a.SetNumberOfTuples(20)
+                            x_label = range(5, 105, 5)
+                            for i in range(20):
+                                a.SetComponent(i, 0, x_label[i])
+                                a.SetComponent(i, 1, behaviors['FA'][i])
 
-                        cn.AddArray('FA', dn_fa.GetID())
+                            cn.AddArray('FA', dn_fa.GetID())
 
-                    if 'MD' in behaviors:
-                        dn_md = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-                        a = dn_md.GetArray()
-                        a.SetNumberOfTuples(20)
-                        x_label = range(5, 105, 5)
-                        for i in range(20):
-                            a.SetComponent(i, 0, x_label[i])
-                            a.SetComponent(i, 1, behaviors['MD'][i])
+                        if 'MD' in behaviors:
+                            dn_md = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                            a = dn_md.GetArray()
+                            a.SetNumberOfTuples(20)
+                            x_label = range(5, 105, 5)
+                            for i in range(20):
+                                a.SetComponent(i, 0, x_label[i])
+                                a.SetComponent(i, 1, behaviors['MD'][i])
 
-                        cn.AddArray('MD', dn_md.GetID())
+                            cn.AddArray('MD', dn_md.GetID())
 
-                    if 'b-zero' in behaviors:
-                        dn_bz = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-                        a = dn_bz.GetArray()
-                        a.SetNumberOfTuples(20)
-                        x_label = range(5, 105, 5)
-                        for i in range(20):
-                            a.SetComponent(i, 0, x_label[i])
-                            a.SetComponent(i, 1, behaviors['b-zero'][i])
+                        if 'b-zero' in behaviors:
+                            dn_bz = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+                            a = dn_bz.GetArray()
+                            a.SetNumberOfTuples(20)
+                            x_label = range(5, 105, 5)
+                            for i in range(20):
+                                a.SetComponent(i, 0, x_label[i])
+                                a.SetComponent(i, 1, behaviors['b-zero'][i])
 
-                        cn.AddArray('b-zero', dn_bz.GetID())
+                            cn.AddArray('b-zero', dn_bz.GetID())
 
-                    cn.SetProperty('default', 'title', 'Diffusion Behaviors')
-                    cn.SetProperty('default', 'showLegend', 'on')
-                    cn.SetProperty('default', 'showMarkers', 'on')
-                    cn.SetProperty('default', 'xAxisPad', '0.2')
-                    cn.SetProperty('default', 'xAxisLabel', 'Fibers Portion (%)')
-                    cn.SetProperty('default', 'yAxisLabel', 'Normalized Metric Values')
+                        cn.SetProperty('default', 'title', 'Diffusion Behaviors')
+                        cn.SetProperty('default', 'showLegend', 'on')
+                        cn.SetProperty('default', 'showMarkers', 'on')
+                        cn.SetProperty('default', 'xAxisPad', '0.2')
+                        cn.SetProperty('default', 'xAxisLabel', 'Fibers Portion (%)')
+                        cn.SetProperty('default', 'yAxisLabel', 'Normalized Metric Values')
 
-                    cvn.SetChartNodeID(cn.GetID())
+                        cvn.SetChartNodeID(cn.GetID())
+                    else:
+                        tableNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLTableNode")
+                        table = tableNode.GetTable()
+                        numPoints = 20
+
+                        arrX = vtk.vtkFloatArray()
+                        arrX.SetName("%")
+                        table.AddColumn(arrX)
+
+                        table.SetNumberOfRows(numPoints)
+                        for i in range(numPoints):
+                            table.SetValue(i, 0, (i / 20) * 100)
+                        col = 1
+                        if 'FA' in behaviors:
+                            arrY1 = vtk.vtkFloatArray()
+                            arrY1.SetName("FA")
+                            table.AddColumn(arrY1)
+
+                            for i in range(numPoints):
+                                table.SetValue(i, col, behaviors['FA'][i])
+                            col += 1
+
+                            plotSeriesNode1 = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLPlotSeriesNode", "FA")
+                            plotSeriesNode1.SetAndObserveTableNodeID(tableNode.GetID())
+                            plotSeriesNode1.SetXColumnName("%")
+                            plotSeriesNode1.SetYColumnName("FA")
+                            plotSeriesNode1.SetPlotType(slicer.vtkMRMLPlotSeriesNode.PlotTypeScatter)
+                            plotSeriesNode1.SetLineStyle(slicer.vtkMRMLPlotSeriesNode.LineStyleNone)
+                            plotSeriesNode1.SetMarkerStyle(slicer.vtkMRMLPlotSeriesNode.MarkerStyleSquare)
+                            plotSeriesNode1.SetUniqueColor()
+                        else:
+                            plotSeriesNode1 = None
+
+                        if 'MD' in behaviors:
+                            arrY2 = vtk.vtkFloatArray()
+                            arrY2.SetName("MD")
+                            table.AddColumn(arrY2)
+
+                            for i in range(numPoints):
+                                table.SetValue(i, col, behaviors['MD'][i])
+                            col += 1
+
+                            plotSeriesNode2 = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLPlotSeriesNode", "MD")
+                            plotSeriesNode2.SetAndObserveTableNodeID(tableNode.GetID())
+                            plotSeriesNode2.SetXColumnName("%")
+                            plotSeriesNode2.SetYColumnName("MD")
+                            plotSeriesNode2.SetPlotType(slicer.vtkMRMLPlotSeriesNode.PlotTypeScatter)
+                            plotSeriesNode2.SetUniqueColor()
+                        else:
+                            plotSeriesNode2 = None
+
+                        if 'b-zero' in behaviors:
+
+                            arrY3 = vtk.vtkFloatArray()
+                            arrY3.SetName("b-zero")
+                            table.AddColumn(arrY3)
+
+                            for i in range(numPoints):
+                                table.SetValue(i, col, behaviors['b-zero'][i])
+                            col += 1
+
+                            plotSeriesNode3 = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLPlotSeriesNode", "b-zero")
+                            plotSeriesNode3.SetAndObserveTableNodeID(tableNode.GetID())
+                            plotSeriesNode3.SetXColumnName("%")
+                            plotSeriesNode3.SetYColumnName("b-zero")
+                            plotSeriesNode3.SetPlotType(slicer.vtkMRMLPlotSeriesNode.PlotTypeScatter)
+                            plotSeriesNode3.SetUniqueColor()
+                        else:
+                            plotSeriesNode3 = None
+
+                        plotChartNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLPlotChartNode")
+                        if plotSeriesNode1 is not None:
+                            plotChartNode.AddAndObservePlotSeriesNodeID(plotSeriesNode1.GetID())
+                        if plotSeriesNode2 is not None:
+                            plotChartNode.AddAndObservePlotSeriesNodeID(plotSeriesNode2.GetID())
+                        if plotSeriesNode3 is not None:
+                            plotChartNode.AddAndObservePlotSeriesNodeID(plotSeriesNode3.GetID())
+
+                        plotChartNode.SetTitle('Fiber Scalars')
+                        plotChartNode.SetXAxisTitle('Fiber Portion (%)')
+                        plotChartNode.SetYAxisTitle('Normalized Metric Values')
+
+                        layoutManager = slicer.app.layoutManager()
+                        layoutWithPlot = slicer.modules.plots.logic().GetLayoutWithPlot(layoutManager.layout)
+                        layoutManager.setLayout(layoutWithPlot)
+
+                        plotWidget = layoutManager.plotWidget(0)
+                        plotViewNode = plotWidget.mrmlPlotViewNode()
+                        plotViewNode.SetPlotChartNodeID(plotChartNode.GetID())
 
             pop_up_window.show()
 
