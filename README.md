@@ -89,7 +89,7 @@ functionality.
   
 ###### Todos:
 
- - Plots in Python interpreterr
+ - Plots in Python interpreter
  
  License
 ----
