@@ -3,8 +3,30 @@ Evaluation of tractograms using diffusion and geometrical metrics.
 
 ## Functionality
 
-...
+With this tool you will be able to compute and view in a fast and compact way multiple statistics about a fiber bundle.
+For each stats the value representing the mean, median and standard deviation are computed, as well as the maximum and
+minimum extremities. Allowing the progress of studies based on descriptive statistics and objective information.
 
+The stats currently supported are:
+
+* **Bundle Proprieties**
+    * Number of fibers
+    * Number of points
+* **Geometrical Proprieties**
+    * Lengths
+    * Shortest path
+    * Turning angle
+* **Connectivity Proprieties**
+    * Seeds position
+    * Termination position
+    * Mid-point position
+* **Diffusion Proprieties**
+    * b-zero intensity
+    * FA value
+    * MD value
+    
+Additionaly, a seamless 3DSlicer integrations enables an interactive and immediate fiber analysis, complemented
+by behaviour graphs. 
 
 ## Installation and Usage.
 
