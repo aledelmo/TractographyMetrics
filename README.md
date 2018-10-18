@@ -1,6 +1,9 @@
 # TractographyMetrics
 Evaluation of tractograms using diffusion and geometrical metrics.
 
+##
+
+
 ## Installation and Usage.
 
 To set up TractographyMetrics the first thing you need to do is obtaining a copy of it.
@@ -75,3 +78,16 @@ $ git pull
 
 It is very important to keep the tool up-to-date to always receive the bug-fixes and to enable the newly developed
 functionality.
+
+###### New Features !!!
+
+  - Now compatible for 3DSlicer 4.9.*
+  
+###### Todos:
+
+ - Implement mid-sagittal ax detector.
+ 
+ License.
+----
+
+Apache License 2.0
