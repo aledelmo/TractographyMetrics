@@ -1,7 +1,9 @@
 # TractographyMetrics
 Evaluation of tractograms using diffusion and geometrical metrics.
 
-##
+## Functionality
+
+...
 
 
 ## Installation and Usage.
@@ -79,15 +81,17 @@ $ git pull
 It is very important to keep the tool up-to-date to always receive the bug-fixes and to enable the newly developed
 functionality.
 
+## Development
+
 ###### New Features !!!
 
   - Now compatible for 3DSlicer 4.9.*
   
 ###### Todos:
 
- - Implement mid-sagittal ax detector.
+ - Plots in Python interpreterr
  
- License.
+ License
 ----
 
 Apache License 2.0
