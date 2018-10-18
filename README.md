@@ -47,6 +47,7 @@ To add diffusion information to the analysis make use of the following optional 
 | ```-md <metric_filepath>``` | ```--metric_filepath``` | Compute stats on the MD metric volume |
 
 If you prefer to have yout output in a different format use the optional flags:
+
 | short flag | long flag |
 | ------ | ------ | ------ |
 | ```-csv``` | ```--save_csv``` |
@@ -61,9 +62,9 @@ Additionally, tu further customize your output with an header use:
 | ```-hd <text>``` | ```--header <text>``` | Add any string of text to the stats |
 
 If you are working on huge amount of fibers and you are experiencing computational time issues you can try to
-downsampling the tractogram
-| short flag | long flag | Action |
+downsampling the tractogram:
 
+| short flag | long flag | Action |
 | ```-r <resampling_percentage>``` | ```--resample <resampling_percentage>``` | Specify the percentage of downsampling of the tractogram fibers (value between 0 and 100) |
 
 To update the tool, once entered in the folder using a terminal, use the command:
