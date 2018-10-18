@@ -49,7 +49,7 @@ To add diffusion information to the analysis make use of the following optional 
 If you prefer to have yout output in a different format use the optional flags:
 
 | short flag | long flag |
-| ------ | ------ | ------ |
+| ------ | ------ |
 | ```-csv``` | ```--save_csv``` |
 | ```-xlsx``` | ```--save_xlsx``` |
 
@@ -65,6 +65,7 @@ If you are working on huge amount of fibers and you are experiencing computation
 downsampling the tractogram:
 
 | short flag | long flag | Action |
+| ------ | ------ | ------ |
 | ```-r <resampling_percentage>``` | ```--resample <resampling_percentage>``` | Specify the percentage of downsampling of the tractogram fibers (value between 0 and 100) |
 
 To update the tool, once entered in the folder using a terminal, use the command:
