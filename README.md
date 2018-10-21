@@ -1,11 +1,11 @@
-# TractographyMetrics
+# Tractography Metrics
 Evaluation of tractograms using diffusion and geometrical metrics.
 
 ## Functionality
 
 With this tool you will be able to compute and view in a fast and compact way multiple statistics about a fiber bundle.
 For each stats the value representing the mean, median and standard deviation are computed, as well as the maximum and
-minimum extremities. Allowing the progress of studies based on descriptive statistics and objective information.
+minimum boundaries. Allowing the progress of studies based on descriptive statistics and quantitative information.
 
 The stats currently supported are:
 
@@ -25,7 +25,7 @@ The stats currently supported are:
     * FA value
     * MD value
     
-Additionaly, a seamless 3DSlicer integrations enables an interactive and immediate fiber analysis, complemented
+Additionally, a seamless 3DSlicer integrations enables an interactive and immediate fiber analysis, complemented
 by behaviour graphs. 
 
 ## Installation and Usage.
@@ -89,11 +89,11 @@ Additionally, tu further customize your output with an header use:
 | ```-hd <text>``` | ```--header <text>``` | Add any string of text to the stats |
 
 If you are working on huge amount of fibers and you are experiencing computational time issues you can try to
-downsampling the tractogram:
+downsample the tractogram:
 
 | short flag | long flag | Action |
 | ------ | ------ | ------ |
-| ```-r <resampling_percentage>``` | ```--resample <resampling_percentage>``` | Specify the percentage of downsampling of the tractogram fibers (value between 0 and 100) |
+| ```-r <resampling_percentage>``` | ```--resample <resampling_percentage>``` | Specify the downsample percentage of the tractogram fibers (value between 0 and 100) |
 
 To update the tool, once entered in the folder using a terminal, use the command:
  ```sh
@@ -112,8 +112,25 @@ functionality.
 ###### Todos:
 
  - Plots in Python interpreter
+
+## Other repositories
+
+This tool is part of a complete segmentation and diffusion framework. It can be complemented by:
+* [3DSlicer Plug-ins]: segmentation and diffusion extension for 3DSlicer
+* [PQL]: the first ever method for the segmentation of pelvic tractograms.
+* [Vessel Segmentation]: deep-learning based approach for the automatic recognition of veins and arteries.
+* [IMAG2 Utilities]: collection of various scripts.
+* [IMAG2 Website]: completely redesigned team website (https://aledelmo.000webhostapp.com)
  
  License
 ----
 
 Apache License 2.0
+
+[//]: #
+   [3DSlicer Plug-ins]: <https://github.com/aledelmo/3DSlicer_Plugins>
+   [PQL]: <https://github.com/aledelmo/PQL>
+   [Tractography Metrics]: <https://github.com/aledelmo/TractographyMetrics>
+   [Vessel Segmentation]: <https://github.com/aledelmo/VesselsSegmentation>
+   [IMAG2 Utilities]: <https://github.com/aledelmo/IMAG2_Utilities>
+   [IMAG2 Website]: <https://github.com/aledelmo/IMAG2_Website>
