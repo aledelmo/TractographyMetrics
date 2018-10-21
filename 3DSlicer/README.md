@@ -1,4 +1,4 @@
-# TractographyMetrics
+# Tractography Metrics
 3D Slicer plug-in for the 'TractographyMetrics' tool
 
 ## Interface
