@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import csv
 import os
 import shutil
@@ -333,7 +330,7 @@ class TractographyMetricsWidget:
                 v = qt.QTableWidgetItem(lines[1][i])
                 table.setItem(i, 1, v)
 
-            table.horizontalHeader().setResizeMode(qt.QHeaderView.Stretch)
+            table.horizontalHeader().setSectionResizeMode(qt.QHeaderView.Stretch)
             table.horizontalHeader().setStretchLastSection(True)
             pop_up_window.layout().addWidget(table)
 
