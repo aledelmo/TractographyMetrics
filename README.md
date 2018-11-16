@@ -120,7 +120,9 @@ This tool is part of a complete segmentation and diffusion framework. It can be 
 * [PQL]: the first ever method for the segmentation of pelvic tractograms.
 * [Vessel Segmentation]: deep-learning based approach for the automatic recognition of veins and arteries.
 * [IMAG2 Utilities]: collection of various scripts.
-* [IMAG2 Website]: completely redesigned team website (<https://aledelmo.000webhostapp.com>)
+* [IMAG2 Website]: completely redesigned team website (<http://www.imag2.org>)
+* [IMAG2 Docs]: general and process documentation
+
  
  License
 ----
@@ -134,3 +136,4 @@ Apache License 2.0
    [Vessel Segmentation]: <https://github.com/aledelmo/VesselsSegmentation>
    [IMAG2 Utilities]: <https://github.com/aledelmo/IMAG2_Utilities>
    [IMAG2 Website]: <https://github.com/aledelmo/IMAG2_Website>
+   [IMAG2 Docs]: <https://github.com/aledelmo/IMAG2_docs>
