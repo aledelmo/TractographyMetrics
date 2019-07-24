@@ -36,10 +36,14 @@ by behaviour graphs.
 
 **Length**: Total length of the fiber (in mm) computed by adding up the lengths of all the streamline segments. The euclidean distance is used for the length computation.
 
+![EDT](img/edt.png)
+
 **Shortest Path**: Length of the straight segmented connecting the two endpoints of a fiber.
 
 **Turning Angle**: Total turning angle projected (Winding). Cumulative signed
     angle between each line segment and the previous one, expressed in degrees.
+
+![Winding](img/winding.png)
 
 **Seeds position**: Position of the starting point (seed) of a streamline
 
@@ -55,9 +59,12 @@ by behaviour graphs.
 
 _____
 
-**Max*: Maximum value
+**Max**: Maximum value
+
 **Min** Minimum value
+
 **Std**: Standard deviation
+
 **Median**: Median (central) value
 
 ## Installation and Usage.
