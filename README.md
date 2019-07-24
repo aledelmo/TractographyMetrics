@@ -28,6 +28,16 @@ The stats currently supported are:
 Additionally, a seamless 3DSlicer integrations enables an interactive and immediate fiber analysis, complemented
 by behaviour graphs. 
 
+## Metrics
+**Number of fibers**: the total number of streamlines composing the tractogram.
+**Number of points**: the total number of points composing a streamline
+**Length**: Total length of the fiber (in mm) computed by adding up the lengths of all the streamline segments.
+**Lengths**: Length of the straight segmented connecting the two endpoints of a fiber.
+**Turning Angle**
+
+
+
+
 ## Installation and Usage.
 
 To set up TractographyMetrics the first thing you need to do is obtaining a copy of it.
