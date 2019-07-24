@@ -29,14 +29,36 @@ Additionally, a seamless 3DSlicer integrations enables an interactive and immedi
 by behaviour graphs. 
 
 ## Metrics
+
 **Number of fibers**: the total number of streamlines composing the tractogram.
+
 **Number of points**: the total number of points composing a streamline
-**Length**: Total length of the fiber (in mm) computed by adding up the lengths of all the streamline segments.
-**Lengths**: Length of the straight segmented connecting the two endpoints of a fiber.
-**Turning Angle**
 
+**Length**: Total length of the fiber (in mm) computed by adding up the lengths of all the streamline segments. The euclidean distance is used for the length computation.
 
+**Shortest Path**: Length of the straight segmented connecting the two endpoints of a fiber.
 
+**Turning Angle**: Total turning angle projected (Winding). Cumulative signed
+    angle between each line segment and the previous one, expressed in degrees.
+
+**Seeds position**: Position of the starting point (seed) of a streamline
+
+**Termination position**: Position of the endpoint (termination condition respected) of a streamline
+
+**Mid-point position**: Position of the central point of a streamline
+
+**b-zero**: Mapping of every point of the streamline on the baseline image. The exact mapped value is computed with a weighted interpolation of the b-zeros of the 12-connected voxel space around the point.
+
+**FA value**: Mapping of every point of the streamline on the FA map.
+
+**MD value**: Mapping of every point of the streamline on the MD map.
+
+_____
+
+**Max*: Maximum value
+**Min** Minimum value
+**Std**: Standard deviation
+**Median**: Median (central) value
 
 ## Installation and Usage.
 
