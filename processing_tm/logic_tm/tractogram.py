@@ -58,7 +58,7 @@ def streamlines_mapvolume(streamlines, volume, affine):
     """
     inverse = np.linalg.inv(affine)
     streamlines = [apply_affine(inverse, np.array(s)) for s in streamlines]
-    mapping = values_from_volume(volume, streamlines)
+    mapping = values_from_volume(volume, streamlines, np.eye(4))
 
     return mapping
 

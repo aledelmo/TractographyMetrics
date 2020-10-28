@@ -12,6 +12,8 @@ def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_file
          perc_resampling, from_plugin=False):
     tractogram = load_tracts(tractogram_filepath)
 
+    txt_filepath = txt_filepath.decode()
+
     if perc_resampling:
         tractogram.resample(perc_resampling)
 
