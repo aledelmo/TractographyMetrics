@@ -9,7 +9,6 @@ import ctk
 import qt
 import slicer
 import vtk
-from builtins import range, int
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 import processing_tm as tm
@@ -330,8 +329,8 @@ class TractographyMetricsWidget:
                 v = qt.QTableWidgetItem(lines[1][i])
                 table.setItem(i, 1, v)
 
-            table.horizontalHeader().setSectionResizeMode(qt.QHeaderView.Stretch)
-            table.horizontalHeader().setStretchLastSection(True)
+            # table.horizontalHeader().setSectionResizeMode(qt.QHeaderView.Stretch)
+            # table.horizontalHeader().setStretchLastSection(True)
             pop_up_window.layout().addWidget(table)
 
             pop_up_window.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)

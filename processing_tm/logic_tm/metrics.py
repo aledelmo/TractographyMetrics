@@ -4,7 +4,6 @@
 from itertools import islice
 
 import numpy as np
-from builtins import int, range
 
 from .utils import ras_to_ijk
 
@@ -143,16 +142,16 @@ class Metrics:
         min_turning_angles = np.amin(turning_angles)
 
         self.txt_str += '\n\n'
-        self.txt_str += '{}: {} °'.format('Mean Turning Angle', mean_turning_angles)
+        self.txt_str += '{}: {} deg'.format('Mean Turning Angle', mean_turning_angles)
         self.txt_dict['Mean Turning Angle'] = mean_turning_angles
         self.txt_str += '\n'
-        self.txt_str += '{}: {} °'.format('Std Turning Angle', std_turning_angles)
+        self.txt_str += '{}: {} deg'.format('Std Turning Angle', std_turning_angles)
         self.txt_dict['Std Turning Angle'] = std_turning_angles
         self.txt_str += '\n'
-        self.txt_str += '{}: {} °'.format('Median Turning Angle', median_turning_angles)
+        self.txt_str += '{}: {} deg'.format('Median Turning Angle', median_turning_angles)
         self.txt_dict['Median Turning Angle'] = median_turning_angles
         self.txt_str += '\n'
-        self.txt_str += '{}: {} °, {}: {} °'.format('Max Turning Angle', max_turning_angles,
+        self.txt_str += '{}: {} deg, {}: {} deg'.format('Max Turning Angle', max_turning_angles,
                                                     'Min Turning Angle', min_turning_angles)
         self.txt_dict['Max Turning Angle'] = max_turning_angles
         self.txt_dict['Min Turning Angle'] = min_turning_angles
@@ -223,7 +222,6 @@ class Metrics:
             cum_len = [get_length(tract[:n]) for n in range(1, len(tract) + 1)]
             ten_perc = get_length(tract) / 20.
             for j in range(1, 21):
-                # print((ten_perc * (j - 1) <= cum_len) & (cum_len <= ten_perc * j))
                 behavior[i, j - 1] = np.asarray(scalar_measurement[i])[
                     (ten_perc * (j - 1) <= cum_len) & (cum_len <= ten_perc * j)].mean()
 

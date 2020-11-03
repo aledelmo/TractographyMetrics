@@ -13,13 +13,8 @@ try:
     import vtk
 except ImportError:
     pass
-from builtins import range
 from six import iteritems
 
-try:
-    import itertools.izip as zip
-except ImportError:
-    pass
 from vtk.util import numpy_support as ns
 from nibabel.streamlines.trk import TrkFile as Trk
 

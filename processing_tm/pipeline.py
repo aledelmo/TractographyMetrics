@@ -12,7 +12,8 @@ def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_file
          perc_resampling, from_plugin=False):
     tractogram = load_tracts(tractogram_filepath)
 
-    txt_filepath = txt_filepath.decode()
+    if from_plugin:
+        txt_filepath = txt_filepath.decode()
 
     if perc_resampling:
         tractogram.resample(perc_resampling)
@@ -55,11 +56,11 @@ def proc(tractogram_filepath, txt_filepath, fa_filepath, bzero_filepath, md_file
         csv_filepath = txt_filepath.split('.')[0] + '.csv'
         save_csv(csv_filepath, body_dict)
     else:
-        if from_plugin is not None:
+        if from_plugin:
             csv_filepath = from_plugin['csv_fname']
             save_csv(csv_filepath, body_dict)
 
-    if from_plugin is not None:
+    if from_plugin:
         return csv_filepath, behaviors
 
 
