@@ -10,7 +10,7 @@ from __future__ import division
 import sys
 
 import numpy as np
-from dipy.tracking.benchmarks.bench_streamline import compress_streamlines
+from dipy.tracking.streamlinespeed import compress_streamlines
 from dipy.tracking.streamline import set_number_of_points, values_from_volume
 from dipy.tracking.metrics import midpoint, winding
 from nibabel.affines import apply_affine
